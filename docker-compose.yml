@@ -1,0 +1,23 @@
+services:
+  adonis_app:
+    container_name: adonis_app
+    build:
+      context: ./adonis-app
+      target: dev
+    restart: unless-stopped
+    user: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    # <— permet de résoudre host.docker.internal
+    env_file:
+      - ./adonis-app/.env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3333
+      - NODE_ENV=development
+    ports:
+      - "49155:3333" # port Adonis
+      - "9229:9229" # port debug Node.js
+    volumes:
+      - ./adonis-app/:/home/node/app
+      - /home/node/app/node_modules # pour éviter les problèmes de permissions
+      - /home/deploy/.ssh/id_rsa:/home/node/.ssh/id_rsa:ro # clé privée en lecture seule

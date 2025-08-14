@@ -1,0 +1,68 @@
+<div
+  id="{{ modalName }}"
+  class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4"
+  tabindex="-1"
+  aria-modal="true"
+  role="dialog"
+>
+  <div
+    class="bg-dark-800 border border-dark-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content"
+  >
+    <div class="flex items-center justify-between border-b border-dark-700">
+      <h3 class="text-xl font-semibold text-white pl-6">
+        {{ title }}
+      </h3>
+      <button
+        onclick="window.{{ closeFuncName }}()"
+        class="text-gray-400 hover:text-white hover:bg-dark-700 py-6 px-8"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      {{{ await $slots.content() }}}
+    </div>
+    <div class="flex justify-end space-x-4 px-5 py-4 border-t border-dark-700">
+      @each(btn in buttons)
+        <button type="{{ btn.type || 'button' }}" onclick="{{ btn.onclick }}" class="{{ btn.class }}">
+          {{ btn.label }}
+      </button>
+      @end
+    </div>
+  </div>
+</div>
+
+@pushOnceTo('scripts')
+  <script defer>
+    window.showModal = function(modalName) {
+      const modal = document.getElementById(modalName);
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.focus();
+      }
+    };
+    
+    window.hideModal = function(modalName) {
+      const modal = document.getElementById(modalName);
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    };
+
+    window.registerModal = function(modalName, { beforeShow }) {
+      window["show" + modalName] = function(params) {
+        if (beforeShow) beforeShow(params);
+        window.showModal(modalName);
+      };
+      window["close" + modalName] = function() {
+        window.hideModal(modalName);
+      };
+      // Fermeture au clic sur le fond
+      document.getElementById(modalName).addEventListener("click", function(event) {
+        if (event.target === this) window.hideModal(modalName);
+      });
+    };
+  </script>
+@end

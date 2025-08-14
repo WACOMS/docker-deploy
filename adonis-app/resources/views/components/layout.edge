@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {{ title || 'Dashboard - Plateforme de Déploiement' }}
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+      
+    </script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0ea5e9",
+              secondary: "#8b5cf6",
+              success: "#059669",
+              warning: "#d97706",
+              danger: "#dc2626",
+              dark: {
+                50: "#fafafa",
+                100: "#f5f5f5",
+                200: "#e5e5e5",
+                300: "#d4d4d4",
+                400: "#a3a3a3",
+                500: "#737373",
+                600: "#525252",
+                700: "#404040",
+                800: "#262626",
+                900: "#171717"
+              }
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      
+      * {
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .status-running {
+        animation: pulse-green 2s infinite;
+      }
+      
+      @keyframes pulse-green {
+        0%, 100% {
+          opacity: 1;
+        }
+      
+        50% {
+          opacity: 0.7;
+        }
+      }
+      
+      .sidebar-transition {
+        transition: all 0.3s ease-in-out;
+      }
+      
+      .card-hover {
+        transition: all 0.2s ease;
+      }
+      
+      .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+
+  <body class="bg-dark-900 text-gray-100 min-h-screen">
+  </body>
+
+  @!sidebar({ activePage })
+
+  <div class="lg:ml-64">
+    @!header()
+
+    <main class="p-8">
+      {{{ await $slots.content() }}}
+    </main>
+  </div>
+
+  @stack('scripts')
+  
+</html>

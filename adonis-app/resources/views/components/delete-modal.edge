@@ -1,0 +1,65 @@
+@baseModal({
+  modalName: 'DeleteModal',
+  title: 'Supprimer le projet',
+  closeFuncName: 'closeDeleteModal',
+  buttons: [
+    {
+      label: 'Annuler',
+      class: 'px-6 py-2 text-gray-400 hover:text-white hover:bg-dark-700 transition-colors',
+      onclick: 'window.closeDeleteModal()',
+      type: 'button'
+    },
+    {
+      label: 'Supprimer',
+      class: 'bg-danger hover:bg-danger/80 text-white px-6 py-2 rounded-sm transition-colors',
+      onclick: 'onDeleteProject()',
+      type: 'button'
+    }
+  ]
+})
+  @slot('content')
+    <p class="mb-4">
+      Veuillez saisir <span class="font-bold">"Supprimer <span id="project-name"></span>"</span>pour confirmer la suppression du projet.
+    </p>
+    <form action="{{ route('project.delete') }}" method="post">
+      {{ csrfField() }}
+      <input
+        type="text"
+        id="delete-confirm-input"
+        class="w-full bg-dark-700 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+        placeholder='Supprimer'
+      />
+      <input type="hidden" name="id" id="project-id" />
+    </form>
+  @end
+@end
+
+@pushOnceTo('scripts')
+  <script>
+    function onDeleteProject() {
+      const deleteConfirmInput = document.getElementById("delete-confirm-input");
+      if (deleteConfirmInput.value.toLowerCase() === deleteConfirmInput.placeholder.toLowerCase()) {
+        window.closeDeleteModal();
+        deleteConfirmInput.form.submit();
+      }
+    }
+    
+    function beforeShow({
+      projectName,
+      projectId
+    }) {
+      const projectNameElement = document.getElementById("project-name");
+      const deleteConfirmInput = document.getElementById("delete-confirm-input");
+      const projectIdInput = document.getElementById("project-id");
+      if (projectName && deleteConfirmInput && projectNameElement && projectIdInput) {
+        projectNameElement.textContent = projectName;
+        deleteConfirmInput.placeholder = `Supprimer ${projectName}`;
+        projectIdInput.value = projectId;
+      }
+    }
+    
+    window.registerModal("DeleteModal", {
+      beforeShow: beforeShow
+    });
+  </script>
+@end

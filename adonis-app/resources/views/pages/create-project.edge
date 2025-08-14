@@ -1,0 +1,478 @@
+@layout({ activePage: 'projects' })
+  @slot('content')
+    <!-- En-tête harmonisée -->
+    <div class="mb-8 max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-white mb-2">
+        Nouveau projet
+      </h2>
+      <p class="text-gray-400">
+        Créez un nouveau projet en plusieurs étapes.
+      </p>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="bg-dark-800 border border-dark-700 rounded-sm p-8 max-w-5xl mx-auto">
+      <!-- Indicateur d'étapes (cercles) -->
+      <div class="mb-10" id="stepsIndicator">
+        <div class="flex items-center justify-center gap-6">
+          <div class="flex items-center">
+            <div
+              data-step="1"
+              class="step-circle w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 border-primary bg-primary text-white"
+            >
+              1
+            </div>
+            <div class="ml-3 text-xs uppercase tracking-wide font-medium" data-step-label="1">
+              Général
+            </div>
+          </div>
+          <div class="h-px w-16 md:w-32 bg-dark-600 relative">
+            <div
+              id="connector-2"
+              class="absolute inset-y-0 left-0 bg-primary h-px w-0 transition-all duration-300"
+            >
+            </div>
+          </div>
+          <div class="flex items-center">
+            <div
+              data-step="2"
+              class="step-circle w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 border-dark-600 text-gray-400"
+            >
+              2
+            </div>
+            <div class="ml-3 text-xs uppercase tracking-wide font-medium text-gray-500" data-step-label="2">
+              Webhook
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form
+        id="multiStepForm"
+        action="{{ route('dashboard.projects.new.form') }}"
+        method="post"
+        class="space-y-12"
+      >
+        {{ csrfField() }}
+        @flashMessage('error')
+          <div
+            class="block mt-4 mb-6 p-4 max-w-5xl bg-red-900/20 border border-red-700 rounded-sm text-red-300"
+          >
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            {{ $message }}
+          </div>
+        @end
+        
+        <!-- Étape 1 -->
+        <section id="step-1" data-step="1" class="space-y-8 animate-step">
+          <div>
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span
+                class="w-6 h-6 rounded-sm bg-primary/20 text-primary text-xs flex items-center justify-center font-bold"
+              >1</span>
+              Informations générales
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Nom -->
+              <div>
+                <label for="project-name" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Nom du projet</label>
+                <input
+                  id="project-name"
+                  type="text"
+                  name="name"
+                  required
+                  class="w-full bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  placeholder="mon-projet"
+                />
+              </div>
+              <!-- Path -->
+              <div>
+                <label for="project-path" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Dossier local</label>
+                <input
+                  id="project-path"
+                  type="text"
+                  name="path"
+                  required
+                  class="w-full bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  placeholder="/home/projects/mon-projet"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-dark-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Git URL -->
+              <div>
+                <label for="git-url" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">URL du dépôt Git</label>
+                <input
+                  id="git-url"
+                  type="text"
+                  name="git_url"
+                  required
+                  class="w-full bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  placeholder="https://github.com/user/repository.git"
+                />
+              </div>
+              <!-- Branche -->
+              <div>
+                <label for="branch" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Branche</label>
+                <input
+                  id="branch"
+                  type="text"
+                  name="branch"
+                  value="main"
+                  required
+                  class="w-full bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  placeholder="main"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-dark-700">
+            <h4 class="text-sm font-medium text-gray-300 mb-4">
+              Commandes personnalisées
+            </h4>
+
+            <!-- Before Pull Commands -->
+            <div class="mb-6">
+              <label for="before-pull-command-0" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Before Pull</label>
+              <div id="before-pull-commands" class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <input
+                    id="before-pull-command-0"
+                    type="text"
+                    name="before_pull_command[0]"
+                    placeholder="Commande avant pull"
+                    class="flex-1 bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  />
+                  <button
+                    type="button"
+                    onclick="addCommand('before-pull')"
+                    class="w-10 h-10 bg-primary hover:bg-primary/80 text-white rounded-sm flex items-center justify-center transition"
+                  >
+                    <i class="fas fa-plus text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- After Pull Commands -->
+            <div class="mb-6">
+              <label for="after-pull-command-0" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">After Pull</label>
+              <div id="after-pull-commands" class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <input
+                    id="after-pull-command-0"
+                    type="text"
+                    name="after_pull_command[0]"
+                    placeholder="Commande après pull"
+                    class="flex-1 bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  />
+                  <button
+                    type="button"
+                    onclick="addCommand('after-pull')"
+                    class="w-10 h-10 bg-primary hover:bg-primary/80 text-white rounded-sm flex items-center justify-center transition"
+                  >
+                    <i class="fas fa-plus text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Restart Commands -->
+            <div class="mb-6">
+              <label for="restart-command-0" class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Restart</label>
+              <div id="restart-commands" class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <input
+                    id="restart-command-0"
+                    type="text"
+                    name="restart_command[0]"
+                    placeholder="Commande de redémarrage"
+                    class="flex-1 bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition"
+                  />
+                  <button
+                    type="button"
+                    onclick="addCommand('restart')"
+                    class="w-10 h-10 bg-primary hover:bg-primary/80 text-white rounded-sm flex items-center justify-center transition"
+                  >
+                    <i class="fas fa-plus text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-6 border-t border-dark-700">
+            <button
+              type="button"
+              onclick="goToStep(2)"
+              class="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-sm transition-colors"
+            >
+              Suivant
+            </button>
+          </div>
+        </section>
+
+        <!-- Étape 2 -->
+        <section id="step-2" data-step="2" class="space-y-8 hidden animate-step">
+          <div>
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span
+                class="w-6 h-6 rounded-sm bg-primary/20 text-primary text-xs flex items-center justify-center font-bold"
+              >2</span>
+              Guide création Webhook GitHub
+            </h3>
+
+            <div class="space-y-6 text-md text-gray-300">
+              <p>
+                1. Cliquez sur le lien ci-dessous pour instancier un webhook sur votre dépôt :
+              </p>
+              <p>
+                <a
+                  id="webhookCreateLink"
+                  href="#"
+                  target="_blank"
+                  class="text-primary underline text-lg font-semibold opacity-80 hover:opacity-100 transition"
+                >
+                  Cliquez ici
+                </a>
+              </p>
+              <p>
+                2. Remplissez le formulaire GitHub avec les valeurs suivantes :
+              </p>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div class="bg-dark-700 rounded-sm p-4 border border-dark-600">
+                  <div class="text-[11px] uppercase tracking-wide text-gray-400 mb-1">
+                    Payload URL
+                  </div>
+                  <code id="payloadUrl" class="text-primary text-base break-all select-all font-semibold">
+
+                    @let(domain = request.ctx.request.request.rawHeaders[1])
+                    @let(webhookUrl = route('github.webhooks', {}, { prefixUrl: 'https://' + domain }) )
+                    {{ webhookUrl }}
+
+                  </code>
+                  <input type="hidden" name="webhook_payload_url" value="{{ webhookUrl }}" />
+                </div>
+                <div class="bg-dark-700 rounded-sm p-4 border border-dark-600">
+                  <div class="text-[11px] uppercase tracking-wide text-gray-400 mb-1">
+                    Content type
+                  </div>
+                  <code class="text-primary text-base select-all font-semibold">application/json</code>
+                  <input type="hidden" name="webhook_content_type" value="application/json" />
+                </div>
+                <div class="bg-dark-700 rounded-sm p-4 border border-dark-600">
+                  <div class="flex items-center justify-between mb-1">
+                    <div class="text-[11px] uppercase tracking-wide text-gray-400">
+                      Secret
+                    </div>
+                  </div>
+                  <code id="webhookSecretDisplay" class="text-primary text-base break-all select-all font-semibold">
+                    {{ secret }}
+                  </code>
+                  <input type="hidden" name="webhook_secret" id="webhookSecretInput" value="{{ secret }}" />
+                </div>
+                <div class="bg-dark-700 rounded-sm p-4 border border-dark-600">
+                  <div class="text-[11px] uppercase tracking-wide text-gray-400 mb-1">
+                    Événements
+                  </div>
+                  <p class="text-base text-gray-400 leading-relaxed">
+                    <span class="text-gray-200">Just the push event</span> ou
+                    <span class="text-gray-200">Pull request</span> si nécessaire.
+                  </p>
+                </div>
+              </div>
+
+              <p class="text-xs text-gray-500">
+                Après validation sur GitHub, cliquez sur "Créer le projet" ci-dessous.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-between pt-6 border-t border-dark-700">
+            <button
+              type="button"
+              onclick="goToStep(1)"
+              class="px-6 py-2 text-gray-400 hover:text-white hover:bg-dark-700 rounded-sm transition-colors"
+            >
+              Précédent
+            </button>
+            <button
+              type="submit"
+              class="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-sm transition-colors"
+            >
+              Créer le projet
+            </button>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    @pushOnceTo('scripts')
+      <script defer>
+        // --- Animations initiales des sections ---
+        document.querySelectorAll(".animate-step").forEach(el => {
+          el.classList.add("opacity-0");
+          setTimeout(() => el.classList.add("transition-opacity", "duration-200"));
+          requestAnimationFrame(() => el.classList.remove("opacity-0"));
+        });
+        // --- Utilitaires ---
+        
+        function buildWebhookLink(gitUrl) {
+          if (!gitUrl) return "";
+          // Gère HTTPS et SSH
+          let org, repo;
+          // HTTPS : https://github.com/org/repo(.git)
+          let httpsMatch = gitUrl.trim().match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)(\.git)?$/i);
+          // SSH : git@github.com:org/repo(.git)
+          let sshMatch = gitUrl.trim().match(/^git@github\.com:([^/]+)\/([^/]+)(\.git)?$/i);
+          if (httpsMatch) {
+            org = httpsMatch[1];
+            repo = httpsMatch[2];
+          } else if (sshMatch) {
+            org = sshMatch[1];
+            repo = sshMatch[2];
+          } else {
+            return "";
+          }
+          return `https://github.com/${org}/${repo.replace(/\.git$/i, "")}/settings/hooks/new`;
+        }
+        
+        function updateWebhookLink() {
+          const gitInput = document.querySelector('input[name="git_url"]');
+          const linkEl = document.getElementById("webhookCreateLink");
+          const url = buildWebhookLink(gitInput.value);
+          if (url) {
+            linkEl.href = url;
+            linkEl.textContent = "Cliquez ici";
+            linkEl.classList.remove("opacity-40");
+          } else {
+            linkEl.href = "#";
+            linkEl.classList.add('text-red-500')
+            linkEl.textContent = "(Entrez une URL GitHub valide ex: https://github.com/org/repo.git)";
+          }
+        }
+        
+        function generateSecret() {
+          const arr = new Uint8Array(24);
+          crypto.getRandomValues(arr);
+          return Array.from(arr).map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+        // --- Étapes ---
+        
+        function updateStepIndicator(step) {
+          document.querySelectorAll(".step-circle").forEach(circle => {
+            const s = Number(circle.dataset.step);
+            circle.classList.remove("bg-primary", "text-white", "border-primary", "text-gray-400", "border-dark-600");
+            if (s < step) {
+              circle.classList.add("bg-primary", "text-white", "border-primary");
+            } else if (s === step) {
+              circle.classList.add("bg-primary", "text-white", "border-primary");
+            } else {
+              circle.classList.add("text-gray-400", "border-dark-600");
+            }
+          });
+          document.querySelectorAll("[data-step-label]").forEach(label => {
+            const s = Number(label.getAttribute("data-step-label"));
+            label.classList.remove("text-primary", "text-gray-500");
+            if (s <= step) label.classList.add("text-primary"); else label.classList.add("text-gray-500");
+          });
+          // Connector
+          const connector = document.getElementById("connector-2");
+          if (connector) connector.style.width = step >= 2 ? "100%" : "0%";
+        }
+        
+        function goToStep(step) {
+          const steps = [ 1, 2 ];
+          steps.forEach(n => {
+            const el = document.getElementById("step-" + n);
+            if (n === step) {
+              el.classList.remove("hidden");
+              requestAnimationFrame(() => {
+                el.classList.remove("opacity-0");
+                el.classList.add("opacity-100");
+              });
+            } else {
+              el.classList.add("hidden");
+            }
+          });
+          updateStepIndicator(step);
+          if (step === 2) {
+            updateWebhookLink();
+          }
+        }
+        
+        // --- Listeners ---
+        (function init() {
+          const gitInput = document.querySelector('input[name="git_url"]');
+          if (gitInput) gitInput.addEventListener("input", updateWebhookLink);
+          updateStepIndicator(1);
+        })();
+      </script>
+      <script defer>
+        // --- Gestion des commandes multiples ---
+        function addCommand(type) {
+          const container = document.getElementById(type + "-commands");
+          const commandDiv = document.createElement("div");
+          commandDiv.className = "flex items-center gap-2";
+          const placeholders = {
+            "before-pull": "Commande avant pull",
+            "after-pull": "Commande après pull",
+            restart: "Commande de redémarrage"
+          };
+          commandDiv.innerHTML = `
+        <input type="text" placeholder="${placeholders[type]}"
+          class="flex-1 bg-dark-700 focus:bg-dark-600 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition" />
+        <button type="button" onclick="removeCommand(this)"
+          class="w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-sm flex items-center justify-center transition">
+          <i class="fas fa-minus text-xs"></i>
+        </button>
+        <button type="button" onclick="addCommand('${type}')"
+          class="w-10 h-10 bg-primary hover:bg-primary/80 text-white rounded-sm flex items-center justify-center transition">
+          <i class="fas fa-plus text-xs"></i>
+        </button>
+      `;
+          container.appendChild(commandDiv);
+
+          // Ré-indexe tous les inputs et leur attribue un id unique
+          const inputs = container.querySelectorAll('input[type="text"]');
+          inputs.forEach((input, idx) => {
+            input.name = `${type.replace("-", "_")}_command[${idx}]`;
+            input.id = `${type}-command-${idx}`;
+          });
+
+          // Supprimer le bouton + de la ligne précédente
+          const previousDiv = commandDiv.previousElementSibling;
+          if (previousDiv) {
+            const plusBtn = previousDiv.querySelector(".bg-primary");
+            if (plusBtn) plusBtn.remove();
+          }
+        }
+        
+        function removeCommand(button) {
+          const commandDiv = button.parentElement;
+          const container = commandDiv.parentElement;
+          const isLast = commandDiv === container.lastElementChild;
+          commandDiv.remove();
+          // Si c'était la dernière ligne et qu'il en reste d'autres, ajouter le bouton + à la nouvelle dernière ligne
+          if (isLast && container.children.length > 0) {
+            const lastDiv = container.lastElementChild;
+            if (!lastDiv.querySelector(".bg-primary")) {
+              const type = container.id.replace("-commands", "");
+              const plusBtn = document.createElement("button");
+              plusBtn.type = "button";
+              plusBtn.onclick = () => addCommand(type);
+              plusBtn.className = "w-10 h-10 bg-primary hover:bg-primary/80 text-white rounded-sm flex items-center justify-center transition";
+              plusBtn.innerHTML = '<i class="fas fa-plus text-xs"></i>';
+              lastDiv.appendChild(plusBtn);
+            }
+          }
+        }
+      </script>
+    @end
+  @end
+@end

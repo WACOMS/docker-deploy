@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion - DeployHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0ea5e9",
+              secondary: "#8b5cf6",
+              success: "#059669",
+              warning: "#d97706",
+              danger: "#dc2626",
+              dark: {
+                50: "#fafafa",
+                100: "#f5f5f5",
+                200: "#e5e5e5",
+                300: "#d4d4d4",
+                400: "#a3a3a3",
+                500: "#737373",
+                600: "#525252",
+                700: "#404040",
+                800: "#262626",
+                900: "#171717"
+              }
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      * { font-family: 'Inter', sans-serif; }
+      .card-hover { transition: all 0.2s ease; }
+      .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    </style>
+  </head>
+  <body class="bg-dark-900 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md bg-dark-800 border border-dark-700 rounded-sm p-8 card-hover">
+      <div class="flex items-center justify-center mb-6">
+        <i class="fas fa-cube text-primary text-3xl mr-2"></i>
+        <span class="text-2xl font-bold text-white">DeployHub</span>
+      </div>
+      <h2 class="text-xl font-semibold text-white mb-2 text-center">Connexion</h2>
+      <!-- Flash message -->
+      @flashMessage('erreur')
+        <div class="mb-4 p-3 bg-red-900/20 border border-red-700 rounded-sm text-red-300 text-sm flex items-center">
+          <i class="fas fa-exclamation-circle mr-2"></i>
+          {{ $message }}
+        </div>
+      @end
+      <form action="{{ route('auth.login.form') }}" method="post" class="space-y-6">
+        {{ csrfField() }}
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Identifiant</label>
+          <input
+            type="text"
+            name="id"
+            required
+            class="w-full bg-dark-700 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+            placeholder="e.larveaux"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Mot de passe</label>
+          <input
+            type="password"
+            name="password"
+            required
+            class="w-full bg-dark-700 border border-dark-600 rounded-sm px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+            placeholder="••••••••"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-3 rounded-sm transition-colors"
+        >
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
