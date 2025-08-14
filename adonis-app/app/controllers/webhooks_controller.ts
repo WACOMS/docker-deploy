@@ -1,6 +1,5 @@
 import Project from '#models/project'
 import { DeploySshService } from '#services/deploy_ssh_service'
-import env from '#start/env'
 import type { HttpContext } from '@adonisjs/core/http'
 import crypto from 'crypto'
 import { DateTime } from 'luxon'
@@ -64,7 +63,10 @@ export default class WebhooksController {
 
     const commands = [project.before_pull_command, 'git pull', project.after_pull_command, project.restart_command].filter(v => v != null).join(" && ")
 
-    await DeploySshService.deployProject(commands, project.path)
+    DeploySshService.deployProject({
+      deployCommands: commands,
+      cwd: project.path
+    })
 
     // Mettre à jour project.last_deploy
     project.lastDeploy = DateTime.now()

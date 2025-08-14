@@ -15,7 +15,7 @@
             <i class="fas fa-folder-open mr-3"></i>
             Projets
         </a>
-        <a href="#" onclick="showLogs()"
+        <a href="{{ route('project.logs') }}" onclick="showLogs()"
             class="{{ activePage === 'logs' ? activeTabClass : inactiveTabClass }}">
             <i class="fas fa-file-alt mr-3"></i>
             Logs

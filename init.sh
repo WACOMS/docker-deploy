@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-USER=deploy
+USER=$(whoami)
 SSH_DIR=/home/$USER/.ssh
 AUTO_MODE=false
 
@@ -76,5 +76,5 @@ if ask "Ajouter la clé publique à authorized_keys ?"; then
 fi
 
 if ask "Configurer les droits sudo pour '$USER' ?"; then
-    echo "$USER ALL=(ALL) NOPASSWD:/usr/bin/git,/usr/bin/docker,/usr/local/bin/docker-compose" | sudo tee /etc/sudoers.d/deploy > /dev/null
+    echo "$USER ALL=(ALL) NOPASSWD:/usr/bin/git,/usr/bin/docker,/usr/local/bin/docker-compose" | sudo tee /etc/sudoers.d/$USER > /dev/null
 fi

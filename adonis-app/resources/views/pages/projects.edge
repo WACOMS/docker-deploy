@@ -44,13 +44,13 @@
                   Projet
                 </th>
                 <th class="text-left py-4 px-6 text-gray-300 font-semibold">
-                  Statut
-                </th>
-                <th class="text-left py-4 px-6 text-gray-300 font-semibold">
                   Branche
                 </th>
                 <th class="text-left py-4 px-6 text-gray-300 font-semibold">
                   Dernier déploiement
+                </th>
+                <th class="text-left py-4 px-6 text-gray-300 font-semibold">
+                  Statut déploiement
                 </th>
                 <th class="text-right py-4 px-6 text-gray-300 font-semibold">
                   Actions
@@ -75,21 +75,21 @@
                       </div>
                     </div>
                   </td>
-                  <td class="py-4 px-6">
-                    @!statusBadge({ status: project.status })
-                  </td>
                   <td class="py-4 px-6 text-gray-300">
                     {{ project.branch }}
                   </td>
                   <td class="py-4 px-6">
                     @if(project.lastDeploy)
-                      @let(lastDeploy = project.lastDeploy.toRelative())
-                      Il y a {{ lastDeploy }}
+                      @let(lastDeploy = project.lastDeploy.toRelative({ locale: "fr" }))
+                      {{ lastDeploy }}
                     @else
                       <span class="text-gray-400 text-sm">
                         Jamais déployé
                     </span>
                     @end
+                  </td>
+                  <td class="py-4 px-6">
+                    @!statusBadge({ status: project.status })
                   </td>
                   <td class="py-4 px-6">
                     <div class="flex items-center justify-end space-x-2">

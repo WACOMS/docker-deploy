@@ -1,0 +1,107 @@
+@layout({ activePage: 'logs' })
+@slot('content')
+<div class="max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-2">Logs — {{ project.name }}</h2>
+      <p class="text-gray-400">Visualisez les logs de déploiement et d'exécution pour ce projet</p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button id="clearBtn" class="px-8 py-2 rounded-sm bg-red-700 text-white hover:bg-red-800 transition">
+        Vider
+      </button>
+    </div>
+  </div>
+
+  @flashMessage('success')
+  <div class="block mt-4 mb-6 p-4 w-full bg-green-900/20 border border-green-700 rounded-sm text-green-300">
+    <i class="fas fa-check-circle mr-2"></i>
+    {{ $message }}
+  </div>
+  @end
+
+  @flashMessage('error')
+  <div class="block mt-4 mb-6 p-4 w-full bg-red-900/20 border border-red-700 rounded-sm text-red-300">
+    <i class="fas fa-exclamation-circle mr-2"></i>
+    {{ $message }}
+  </div>
+  @end
+
+  <div class="bg-dark-800 border border-dark-700 rounded-sm p-6">
+    <div class="mb-4 text-sm text-gray-400 flex items-center justify-between">
+      <div class="text-xs text-gray-400">
+        Dernière mise à jour :
+        @if(project.lastDeploy)
+        @let(lastDeploy = project.lastDeploy.toRelative({ locale: "fr" }))
+        <span class="text-gray-300">{{ lastDeploy }}</span>
+        @else
+        <span class="text-gray-500">Jamais</span>
+        @end
+      </div>
+    </div>
+
+    <div class="bg-black/60 border border-dark-600 rounded-sm p-4 h-[60vh] overflow-auto">
+      <pre id="logsOutput" class="whitespace-pre-wrap text-xs leading-relaxed text-gray-200 font-mono m-0">
+@if(logs)
+{{ logs }}
+@else
+Aucun log disponible.
+@end
+          </pre>
+    </div>
+  </div>
+</div>
+
+
+@pushOnceTo('scripts')
+<script defer>
+  (function () {
+    const output = document.getElementById('logsOutput');
+    const clearBtn = document.getElementById('clearBtn');
+
+    let tailing = false;
+    let tailInterval = null;
+
+    function setBusy(state) {
+      [clearBtn].forEach(b => b.disabled = state);
+      if (state) refreshBtn.textContent = 'Chargement...'; else refreshBtn.textContent = 'Rafraîchir';
+    }
+
+    clearBtn.addEventListener('click', async () => {
+      if (!confirm('Vider les logs ? Cette action est irréversible.')) return;
+      try {
+        clearBtn.disabled = true;
+        const res = await fetch(clearUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+          },
+          body: JSON.stringify({})
+        });
+        if (!res.ok) throw new Error('Impossible de vider les logs');
+        output.textContent = '';
+        alert('Logs vidés.');
+      } catch (err) {
+        console.error(err);
+        alert('Erreur lors du vidage des logs.');
+      } finally {
+        clearBtn.disabled = false;
+      }
+    });
+
+    // Stop tailing when page hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && tailing) stopTailing();
+    });
+
+    // Clean on unload
+    window.addEventListener('beforeunload', () => {
+      if (tailInterval) clearInterval(tailInterval);
+    });
+  })();
+</script>
+@end
+@end
+@end
