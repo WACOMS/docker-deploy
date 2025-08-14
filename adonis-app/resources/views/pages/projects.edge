@@ -93,9 +93,9 @@
                   </td>
                   <td class="py-4 px-6">
                     <div class="flex items-center justify-end space-x-2">
-                      <button onclick="viewLogs({{ project.id }})" class="text-primary hover:text-primary/80 p-2" title="Logs">
+                      <a href="{{ route('project.logs', { id: project.id }) }}" class="text-primary hover:text-primary/80 p-2" title="Logs">
                         <i class="fas fa-file-alt"></i>
-                      </button>
+                      </a>
                       <button
                         onclick="rollbackProject({{ project.id }})"
                         class="text-warning hover:text-warning/80 p-2"

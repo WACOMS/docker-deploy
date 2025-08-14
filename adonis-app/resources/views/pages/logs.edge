@@ -7,9 +7,10 @@
       <p class="text-gray-400">Visualisez les logs de déploiement et d'exécution pour ce projet</p>
     </div>
 
-    <div class="flex items-center gap-3">
-      <button id="clearBtn" class="px-8 py-2 rounded-sm bg-red-700 text-white hover:bg-red-800 transition">
-        Vider
+    <div>
+      <button id="refreshBtn" class="inline-flex items-center px-4 py-2 bg-green-700 hover:bg-green-600 text-sm text-gray-200 rounded-sm border border-green-600">
+        <i class="fas fa-sync-alt mr-2"></i>
+        Rafraichir
       </button>
     </div>
   </div>
@@ -41,7 +42,7 @@
       </div>
     </div>
 
-    <div class="bg-black/60 border border-dark-600 rounded-sm p-4 h-[60vh] overflow-auto">
+    <div class="bg-black/60 border border-dark-600 rounded-sm p-4 h-[60vh] overflow-auto" id="logsContainer">
       <pre id="logsOutput" class="whitespace-pre-wrap text-xs leading-relaxed text-gray-200 font-mono m-0">
 @if(logs)
 {{ logs }}
@@ -57,49 +58,53 @@ Aucun log disponible.
 @pushOnceTo('scripts')
 <script defer>
   (function () {
+    const container = document.getElementById('logsContainer');
     const output = document.getElementById('logsOutput');
-    const clearBtn = document.getElementById('clearBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
 
-    let tailing = false;
-    let tailInterval = null;
-
-    function setBusy(state) {
-      [clearBtn].forEach(b => b.disabled = state);
-      if (state) refreshBtn.textContent = 'Chargement...'; else refreshBtn.textContent = 'Rafraîchir';
+    { /* changed: suppression du tailing par interval */ }
+    async function fetchLogs() {
+      if (!refreshBtn) return;
+      refreshBtn.setAttribute('disabled', 'disabled');
+      const originalLabel = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Chargement...';
+      try {
+        const res = await fetch('{{ route("project.logs.fetch", { id: project.id }) }}', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        const responseText = await res.text();
+        if (!res.ok) {
+          output.textContent = "Erreur lors de la récupération des logs";
+          console.error(responseText);
+        } else {
+          output.textContent = responseText;
+        }
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        });
+      } catch (err) {
+        output.textContent = "Erreur réseau lors de la récupération des logs";
+        console.error(err);
+      } finally {
+        refreshBtn.removeAttribute('disabled');
+        refreshBtn.innerHTML = originalLabel;
+      }
     }
 
-    clearBtn.addEventListener('click', async () => {
-      if (!confirm('Vider les logs ? Cette action est irréversible.')) return;
-      try {
-        clearBtn.disabled = true;
-        const res = await fetch(clearUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-          },
-          body: JSON.stringify({})
-        });
-        if (!res.ok) throw new Error('Impossible de vider les logs');
-        output.textContent = '';
-        alert('Logs vidés.');
-      } catch (err) {
-        console.error(err);
-        alert('Erreur lors du vidage des logs.');
-      } finally {
-        clearBtn.disabled = false;
-      }
-    });
+    { /* changed: suppression de la logique d'interval et d'état tailing */ }
 
-    // Stop tailing when page hidden
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && tailing) stopTailing();
-    });
+    // Attacher le clic du bouton pour rafraichir manuellement
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', fetchLogs);
+    }
 
-    // Clean on unload
-    window.addEventListener('beforeunload', () => {
-      if (tailInterval) clearInterval(tailInterval);
-    });
+    // Optionnel : fetch initial pour remplir la zone au chargement
+    fetchLogs();
   })();
 </script>
 @end

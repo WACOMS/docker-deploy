@@ -63,9 +63,12 @@ export default class WebhooksController {
 
     const commands = [project.before_pull_command, 'git pull', project.after_pull_command, project.restart_command].filter(v => v != null).join(" && ")
 
+    project.status = "pending"
+    await project.save()
     DeploySshService.deployProject({
       deployCommands: commands,
-      cwd: project.path
+      cwd: project.path,
+      project: project
     })
 
     // Mettre à jour project.last_deploy

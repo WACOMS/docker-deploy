@@ -18,14 +18,13 @@ router.get('/connexion', [AuthController, 'showLoginForm']).as('auth.login')
 router.post('/connexion', [AuthController, 'login']).as('auth.login.form')
 router.get('/deconnexion', [AuthController, 'logout']).as('auth.logout')
 
-router
-  .group(() => {
+router.group(() => {
     router.get('/', [DashboardController, 'projects']).as('dashboard.index')
     router.get('/projets/nouveau', [DashboardController, 'newProjectView']).as('dashboard.projects.new.view')
     router.post('/projets', [DashboardController, 'createProject']).as('dashboard.projects.new.form')
     router.post('/projets/supprimer', [DashboardController, 'deleteProject']).as('project.delete')
-    router.get("/logs", [LogsController, "showLogs"]).as('project.logs')
-  })
-  .middleware(middleware.auth())
+    router.get("/logs/:id", [LogsController, "showLogs"]).as('project.logs')
+    router.get('/logs/:id/history', [LogsController, 'getHistory']).as('project.logs.fetch')
+}).middleware(middleware.auth())
 
 router.post('/github-webhooks', [WebhooksController, 'handleWebhook']).as('github.webhooks')

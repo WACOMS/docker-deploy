@@ -32,6 +32,9 @@ export default class Project extends BaseModel {
   @column()
   declare webhook_secret: string
 
+  @column()
+  declare status?: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
